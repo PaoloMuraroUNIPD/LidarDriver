@@ -64,25 +64,5 @@ class LidarDriver {
             buffer.clear();
             count = 0;
             index = 0;
-        }
-        
-        //ritorna il contenuto dell' ultima scan del buffer e lo elimina (?) da controllare
-        std::vector<double> get_scan(void) { 
-            
-            if (count > 0) {
-
-                std::vector<double> v;
-                v = buffer[index];
-
-                count = count - 1;
-                index = index - 1;
-
-                return v;
-            }
-            else {
-                //eccezione, ... BUFFER VUOTO!,
-                return nullptr;
-            }
-        }
-          
+        }  
 }
