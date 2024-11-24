@@ -64,7 +64,6 @@ class LidarDriver {
 
         //elimina tutte le scan
         void clear_buffer(void) {
-          
             buffer.clear();
             count = 0;
             index = 0;
