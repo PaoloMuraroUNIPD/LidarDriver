@@ -67,12 +67,17 @@
 //            index = 0;
 //        }
 //}
-LidarDriver::LidarDriver(double res, size_t buffer_dim) {
+LidarDriver::LidarDriver(double res) {
+    //inizializza il buffer con la sua dimensione
+    buffer.resize(BUFFER_DIM);
     resolution = res;
-    size = buffer_dim;
-    count = 0;
-    index = 0;
-
+    //inizializza le varie scansioni con il numero giusto di angoli
+    for (int i = 0; i < BUFFER_DIM; ++i) {
+        buffer.at(i).resize((180 / res)+1);
+    }
+    //inizializza gli indici
+    index_new = 0;
+    index_old = 0;
 }
 
 void LidarDriver::new_scan(const std::vector<double> &scan) {
@@ -108,9 +113,10 @@ std::vector<double> LidarDriver::get_scan() {
 }
 
 void LidarDriver::clear_buffer() {
-            buffer.clear();
-            count = 0;
-            index = 0;
+    buffer.clear();
+    count = 0;
+    index_new = 0;
+    index_old = 0;
 }
 
 double LidarDriver::get_distance(double angle) {
@@ -118,6 +124,15 @@ double LidarDriver::get_distance(double angle) {
 }
 
 std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {
-    os <<"Ciao";
+
+    if (!lidar.buffer.empty()) {
+        os << "Ultima scansione:\n";
+        for (double scansione: lidar.buffer.at(lidar.index_new)) {
+            os << scansione << " ";
+        }
+    } else {
+        os << "Buffer vuoto";
+    }
+    os << std::endl;
     return os;
 }
