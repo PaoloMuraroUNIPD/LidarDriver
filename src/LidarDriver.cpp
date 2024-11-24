@@ -18,9 +18,6 @@ class LidarDriver {
         //indice scansione, punta all ultima scansione del lidar
         size_t index;
 
-        //massimo buffer poi torna (size??)
-        int BUFFER_MAX;
-
         /* boolean isEmpty() { return count == 0 } */
 
     public:
