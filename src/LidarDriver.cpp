@@ -75,8 +75,10 @@ LidarDriver::LidarDriver(double res) : resolution(res) {
 //        buffer.at(i).resize((180 / res)+1);
 //    }
     //inizializza gli indici
+
     index_new = 0;
     index_old = 0;
+
 }
 
 void LidarDriver::new_scan(const std::vector<double> &scan) {
@@ -119,7 +121,7 @@ void LidarDriver::clear_buffer() {
 }
 
 double LidarDriver::get_distance(double angle) {
-    return 0;
+    return buffer.at(index_new).at(static_cast<int>(angle / resolution));
 }
 
 std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {

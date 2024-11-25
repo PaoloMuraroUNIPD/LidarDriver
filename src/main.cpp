@@ -24,7 +24,7 @@ int main(void) {
             1.04, 0.56, 1.59, 0.22, 1.72, 0.74, 1.26, 0.29, 1.51, 0.81,
             0.36, 1.18, 0.60, 1.39, 0.57, 1.15, 0.38, 1.70, 1.02, 0.73,
             1.89, 0.53, 1.32, 0.44, 2.00, 0.78, 1.16, 0.69, 1.74, 1.61,
-            0.09, 1.54, 0.79, 1.91, 0.39, 1.92, 0.80, 1.93, 0.63, 1.94
+            0.09
     };
 //    Serve un costruttore generico?
     LidarDriver lidarDriver(1);
@@ -32,7 +32,7 @@ int main(void) {
 
 //    ANCORA DA IMPLEMENTARE
 //    lidarDriver.new_scan(scansione);
-//    lidarDriver.get_distance(60);
+    std::cout<<lidarDriver.get_distance(180)<<std::endl;
 //    lidarDriver.get_scan();
 //    lidarDriver.clear_buffer();
 
