@@ -9,7 +9,7 @@
 class LidarDriver {
 
     private:
-        double resolution;
+        const double resolution;
         std::vector<std::vector<double>> buffer;
         size_t size;
         size_t count;

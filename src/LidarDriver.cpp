@@ -67,14 +67,13 @@
 //            index = 0;
 //        }
 //}
-LidarDriver::LidarDriver(double res) {
+LidarDriver::LidarDriver(double res) : resolution(res) {
     //inizializza il buffer con la sua dimensione
     buffer.resize(BUFFER_DIM);
-    resolution = res;
     //inizializza le varie scansioni con il numero giusto di angoli
-    for (int i = 0; i < BUFFER_DIM; ++i) {
-        buffer.at(i).resize((180 / res)+1);
-    }
+//    for (int i = 0; i < BUFFER_DIM; ++i) {
+//        buffer.at(i).resize((180 / res)+1);
+//    }
     //inizializza gli indici
     index_new = 0;
     index_old = 0;
@@ -124,8 +123,7 @@ double LidarDriver::get_distance(double angle) {
 }
 
 std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {
-
-    if (!lidar.buffer.empty()) {
+    if (!lidar.buffer.empty() && !lidar.buffer.at(lidar.index_new).empty()) {
         os << "Ultima scansione:\n";
         for (double scansione: lidar.buffer.at(lidar.index_new)) {
             os << scansione << " ";
@@ -134,8 +132,6 @@ std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {
         os << "Buffer vuoto";
     }
     os << std::endl;
-    std::cout << lidar.index_new;
-
     return os;
 }
 
@@ -143,6 +139,6 @@ std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {
 //questa funzione accetta come argomento il riferimento a un index e incrementa il suo contenuto in modo circolare
 void LidarDriver::increment_index(size_t *index) {
     ++(*index);
-    if(*index >= BUFFER_DIM)
+    if (*index >= BUFFER_DIM)
         *index = 0;
 }
