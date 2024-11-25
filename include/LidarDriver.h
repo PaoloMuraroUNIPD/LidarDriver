@@ -15,6 +15,7 @@ class LidarDriver {
         size_t count;
         size_t index_old;
         size_t index_new;
+        void increment_index(size_t* index);
 
     public:
         LidarDriver(double res);

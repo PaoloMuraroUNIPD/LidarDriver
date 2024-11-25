@@ -134,5 +134,15 @@ std::ostream &operator<<(std::ostream &os, const LidarDriver &lidar) {
         os << "Buffer vuoto";
     }
     os << std::endl;
+    std::cout << lidar.index_new;
+
     return os;
+}
+
+
+//questa funzione accetta come argomento il riferimento a un index e incrementa il suo contenuto in modo circolare
+void LidarDriver::increment_index(size_t *index) {
+    ++(*index);
+    if(*index >= BUFFER_DIM)
+        *index = 0;
 }
