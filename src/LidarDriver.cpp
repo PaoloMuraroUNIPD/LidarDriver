@@ -27,9 +27,15 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     //se la scansione ha un numero maggiore di dati taglio i dati mancanti
     if (scan_copy.size() > expected_size) { scan_copy.resize(expected_size); }
 
+    //incremento l'indice circolare e salvo il vettore nella usa locazione
     increment_index(index_new);
+    buffer[index_new] = scan_copy;
+
+    //se il count non e gia pieno aumento il count
+    if (count < BUFFER_DIM) { count++; }
 
     //inseriesco il nuovo scan nel buffer
+    /*
     if (count < BUFFER_DIM ) { 
         buffer.push_back(scan_copy);
         count++;
@@ -37,6 +43,7 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     else { 
         buffer[index_new] = scan_copy; 
     }
+    */
 }
 
 // ****** new scan provvisorio. Usato per testare la classe
