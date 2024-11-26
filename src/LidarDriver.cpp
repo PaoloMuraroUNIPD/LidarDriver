@@ -2,14 +2,13 @@
 #include <stdexcept> // Gestione delle eccezioni
 
 // Costruttore
-LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), count(0), index_old(0), index_new(-1) {
+LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), index_old(0), index_new(-1) {
     if (resolution < 0.1 || resolution > 1.0) {
         throw std::invalid_argument("La risoluzione deve essere compresa tra 0.1 e 1.");
     }
 }
 
 // // Metodo ausiliario che incrementa un indice in modo circolare, mantenendolo entro il range [0, BUFFER_DIM - 1]
-// ******* Ho sostituito il puntatore con un riferimento e ho reso l'operazione più leggibile
 void LidarDriver::increment_index(size_t& index) {
     index = (index + 1) % BUFFER_DIM;
 }
@@ -17,76 +16,41 @@ void LidarDriver::increment_index(size_t& index) {
 void LidarDriver::new_scan(const std::vector<double>& scan) {
 
     //il numero di scansioni che ci aspettiamo di rcevere dallo scan
-    int expected_size = (180/resolution) + 1;
+    size_t expected_size = static_cast<size_t>(180 / resolution) + 1;
 
     //creo una copia dello scan su cui posso fare il resize
     std::vector<double> scan_copy = scan;
 
     // se la scansione ha un numero minore di dati della size prevista completo con 0
-    if (scan_copy.size() < expected_size) { scan_copy.resize(expected_size, 0); }
+    if (scan_copy.size() < expected_size) { scan_copy.resize(expected_size, 0.0); }
     //se la scansione ha un numero maggiore di dati taglio i dati mancanti
     if (scan_copy.size() > expected_size) { scan_copy.resize(expected_size); }
 
-    //salvo il vettore nella usa locazione all indice e incremento l' indice
-    buffer[index_new] = scan_copy;
-    increment_index(index_new);
-
-    //se il count non e gia max aumento il count
-    if (count < BUFFER_DIM) { count++; }
-    else { increment_index(index_old); }
-
-    /*
-    //senza il count, includere cmath {da testare}
-    if ( (abs.(index_new - index_old) < ... )
-    */
-
-}
-
-// ****** new scan provvisorio. Usato per testare la classe
-// NB. cambiare nel file 'LidarDrive.h' e mettere const std::vector<double>& scan tra parentesi
-/*
-void LidarDriver::new_scan() {
-    std::vector<double> scan = {
-        0.72, 0.34, 1.57, 0.11, 1.98, 1.22, 0.89, 1.01, 1.43, 1.03,
-        1.88, 0.51, 1.71, 0.45, 0.99, 1.35, 0.84, 1.44, 0.26, 1.62,
-        1.17, 0.05, 1.90, 0.61, 0.20, 1.65, 0.37, 1.09, 1.55, 0.23,
-        1.47, 0.10, 1.78, 0.90, 1.53, 0.30, 1.76, 1.06, 0.59, 1.27,
-        0.14, 1.81, 1.49, 0.72, 1.66, 0.33, 1.38, 1.00, 0.43, 0.28,
-        1.46, 0.16, 1.63, 0.31, 1.25, 1.07, 0.95, 1.37, 0.18, 1.68,
-        0.46, 1.21, 1.52, 0.19, 1.83, 0.66, 1.29, 0.92, 0.35, 1.12,
-        1.75, 0.54, 1.33, 0.01, 1.85, 0.58, 0.48, 1.20, 1.11, 0.07,
-        1.87, 0.64, 0.15, 1.45, 0.77, 1.24, 0.02, 0.88, 1.82, 0.70,
-        1.40, 0.08, 1.77, 0.93, 1.05, 0.12, 1.13, 0.42, 1.34, 0.03,
-        1.19, 0.62, 0.17, 1.56, 1.08, 0.50, 1.64, 0.40, 0.96, 1.14,
-        0.27, 1.86, 0.55, 1.41, 0.71, 0.21, 1.50, 0.04, 0.68, 1.84,
-        0.47, 1.31, 1.10, 0.25, 1.69, 0.91, 1.28, 0.49, 1.73, 0.35,
-        0.98, 1.60, 0.41, 1.23, 0.09, 1.67, 0.52, 1.42, 0.32, 1.58,
-        0.67, 1.30, 0.06, 1.79, 0.24, 1.48, 0.65, 1.36, 0.13, 1.80,
-        1.04, 0.56, 1.59, 0.22, 1.72, 0.74, 1.26, 0.29, 1.51, 0.81,
-        0.36, 1.18, 0.60, 1.39, 0.57, 1.15, 0.38, 1.70, 1.02, 0.73,
-        1.89, 0.53, 1.32, 0.44, 2.00, 0.78, 1.16, 0.69, 1.74, 1.61,
-        0.09
-    };
-    buffer[index_new] = scan;
-    increment_index(index_new);
-    if (count < size) {
-        ++count;
-    } else {
+    // Incrementa l'indice della scansione più vecchia se il buffer è pieno
+    if (index_new != size_t(-1) && (index_new + 1) % BUFFER_DIM == index_old) {
         increment_index(index_old);
     }
+    //salvo il vettore nella usa locazione all indice e incremento l' indice
+    increment_index(index_new);
+    buffer[index_new] = std::move(scan_copy);
+
+    //buffer vuoto, inizializzo index_old
+    if (index_new == size_t(-1)) {
+        index_new = 0;
+        index_old = 0;
+    }
 }
-*/
 
 // Restituisce e rimuove la scansione più vecchia dal buffer
 std::vector<double> LidarDriver::get_scan() {
-    if (count == 0) {
+    if (index_new == size_t(-1)) {
         throw std::runtime_error("Il buffer è vuoto.");
     }
     std::vector<double> oldest_scan = buffer[index_old];
-    increment_index(index_old);
-    --count;
-    if (count == 0) {
-        index_new = -1;
+    if (index_old == index_new) {
+        index_new = size_t(-1);
+    } else {
+        increment_index(index_old);
     }
     return oldest_scan;
 }
@@ -95,13 +59,12 @@ void LidarDriver::clear_buffer() {
     for (auto& scan : buffer) {
         scan.clear();
     }
-    count = 0;
-    index_new = -1;
+    index_new = size_t(-1);
     index_old = 0;
 }
 
 double LidarDriver::get_distance(double angle) const {
-    if (count == 0 || index_new == size_t(-1)) {
+    if (index_new == size_t(-1)) {
         throw std::runtime_error("Il buffer è vuoto.");
     }
     if (angle < 0 || angle > 180) {
@@ -112,10 +75,8 @@ double LidarDriver::get_distance(double angle) const {
     return latest_scan.at(index);
 }
 
-//******** index_new puntava alla prossima scansione
-//******** migliorato output
 std::ostream& operator<<(std::ostream& os, const LidarDriver& lidar) {
-    if (lidar.count == 0 || lidar.index_new == size_t(-1)) {
+    if (lidar.index_new == size_t(-1)) {
         os << "Buffer vuoto\n";
     } else {
         os << "Ultima scansione:\n";
