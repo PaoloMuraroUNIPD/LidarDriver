@@ -1,36 +1,6 @@
 #include "../include/LidarDriver.h"
 #include <stdexcept> // Gestione delle eccezioni
 
-//
-//
-//        void new_scan(const std::vector<double>& scan) {
-//
-//            /* parte alta di 181 (numero di scansioni a 1) moltiplicato per la risoluzione,
-//            il numero di scansioni che ci aspettiamo di rcevere dallo scan */
-//            true_size = (181/resolution) + 1;
-//
-//            // se la scansione ha un numero minore di dati della size prevista completo con 0
-//            if (scan.size() < true_size) { scan.resize(true_size, 0); }
-//            //se la scansione ha un numero maggiore di dati taglio i dati mancanti
-//            if (scan.size() > true_size) { scan.resize(true_size);
-//
-//            //aggiungo il nuovo vettore
-//            if (index < (size - 1)) {
-//                //mette scan nel vettore buffer nella posizione dell' index sucessivo
-//                index = index + 1;
-//                //dovrebbe mettere tutti i valori della scan in buffer[(index + 1)]
-//                for (int i : scan) buffer[index].push_back(i);
-//            }
-//            else
-//            {
-//                index = 0;
-//                for (int i : scan) buffer[index].push_back(i);
-//            }
-//            //se il buffer è non gia pieno, incrementa count
-//            if (count < size) { count = count + 1; }
-//        }
-//
-
 // Costruttore
 LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), size(BUFFER_DIM), count(0), index_old(0), index_new(0) {
     if (resolution < 0.1 || resolution > 1.0) {
@@ -44,8 +14,35 @@ void LidarDriver::increment_index(size_t& index) {
     index = (index + 1) % BUFFER_DIM;
 }
 
+void LidarDriver::new_scan(const std::vector<double>& scan) {
+
+    //il numero di scansioni che ci aspettiamo di rcevere dallo scan
+    int expected_size = (180/resolution) + 1;
+
+    //creo una copia dello scan su cui posso fare il resize
+    std::vector<double> scan_copy = scan;
+
+    // se la scansione ha un numero minore di dati della size prevista completo con 0
+    if (scan_copy.size() < expected_size) { scan_copy.resize(expected_size, 0); }
+    //se la scansione ha un numero maggiore di dati taglio i dati mancanti
+    if (scan_copy.size() > expected_size) { scan_copy.resize(expected_size); }
+
+    increment_index(index_new);
+
+    //inseriesco il nuovo scan nel buffer
+    if (count < BUFFER_DIM ) { 
+        buffer.push_back(scan_copy);
+        count++;
+    }
+    else { 
+        buffer[index_new] = scan_copy; 
+    }
+    
+}
+
 // ****** new scan provvisorio. Usato per testare la classe
 // NB. cambiare nel file 'LidarDrive.h' e mettere const std::vector<double>& scan tra parentesi
+/*
 void LidarDriver::new_scan() {
     std::vector<double> scan = {
         0.72, 0.34, 1.57, 0.11, 1.98, 1.22, 0.89, 1.01, 1.43, 1.03,
@@ -76,6 +73,7 @@ void LidarDriver::new_scan() {
         increment_index(index_old);
     }
 }
+*/
 
 // Restituisce e rimuove la scansione più vecchia dal buffer
 std::vector<double> LidarDriver::get_scan() {
@@ -126,31 +124,3 @@ std::ostream& operator<<(std::ostream& os, const LidarDriver& lidar) {
     }
     return os;
 }
-
-// void LidarDriver::new_scan(const std::vector<double> &scan) {
-//              PARTE SCRITTA DA ALBERTO
-//            /* parte alta di 181 (numero di scansioni a 1) moltiplicato per la risoluzione,
-//            il numero di scansioni che ci aspettiamo di rcevere dallo scan */
-//            true_size = (181/resolution) + 1;
-//
-//            // se la scansione ha un numero minore di dati della size prevista completo con 0
-//            if (scan.size() < true_size) { scan.resize(true_size, 0); }
-//            //se la scansione ha un numero maggiore di dati taglio i dati mancanti
-//            if (scan.size() > true_size) { scan.resize(true_size);
-//
-//            //aggiungo il nuovo vettore
-//            if (index < (size - 1)) {
-//                //mette scan nel vettore buffer nella posizione dell' index sucessivo
-//                index = index + 1;
-//                //dovrebbe mettere tutti i valori della scan in buffer[(index + 1)]
-//                for (int i : scan) buffer[index].push_back(i);
-//            }
-//            else
-//            {
-//                index = 0;
-//                for (int i : scan) buffer[index].push_back(i);
-//            }
-//            //se il buffer è non gia pieno, incrementa count
-//            if (count < size) { count = count + 1; }
-//        }
-// }
