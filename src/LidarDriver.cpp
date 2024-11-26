@@ -28,8 +28,9 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     if (scan_copy.size() > expected_size) { scan_copy.resize(expected_size); }
 
     //incremento l'indice circolare e salvo il vettore nella usa locazione
-    increment_index(index_new);
     buffer[index_new] = scan_copy;
+    increment_index(index_new);
+
     
     //se il count non e gia max aumento il count
     if (count < BUFFER_DIM) { count++; }
