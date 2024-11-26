@@ -35,6 +35,11 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     if (count < BUFFER_DIM) { count++; }
     else { increment_index(index_old); }
 
+    /*
+    //senza il count, includere cmath {da testare}
+    if ( (abs.(index_new - index_old) < ... )
+    */
+
 }
 
 // ****** new scan provvisorio. Usato per testare la classe
