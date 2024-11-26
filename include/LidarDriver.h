@@ -20,7 +20,7 @@ class LidarDriver {
 
     public:
 
-        // Costruttore
+        //Costruttore
         explicit LidarDriver(double res);
 
         // Aggiunge una nuova scansione al buffer
