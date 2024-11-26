@@ -26,8 +26,7 @@ class LidarDriver {
 
         // Aggiunge una nuova scansione al buffer
         // ********************DA MODIFICARE************* ====> BRUTEFORCE
-        ////const std::vector<double>& scan
-        void new_scan(); 
+        void new_scan(const std::vector<double>& scan); 
 
         // Restituisce e rimuove la scansione più vecchia
         std::vector<double> get_scan();
