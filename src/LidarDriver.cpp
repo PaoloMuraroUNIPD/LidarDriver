@@ -2,7 +2,7 @@
 #include <stdexcept> // Gestione delle eccezioni
 
 // Costruttore
-LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), size(BUFFER_DIM), count(0), index_old(0), index_new(0) {
+LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), size(BUFFER_DIM), count(0), index_old(0), index_new(-1) {
     if (resolution < 0.1 || resolution > 1.0) {
         throw std::invalid_argument("La risoluzione deve essere compresa tra 0.1 e 1.");
     }
@@ -85,6 +85,9 @@ std::vector<double> LidarDriver::get_scan() {
     std::vector<double> oldest_scan = buffer[index_old];
     increment_index(index_old);
     --count;
+    if (count == 0) {
+        index_new = -1;
+    }
     return oldest_scan;
 }
 
@@ -93,33 +96,30 @@ void LidarDriver::clear_buffer() {
         scan.clear();
     }
     count = 0;
-    index_new = 0;
+    index_new = -1;
     index_old = 0;
 }
 
-// *****Ho corretto un errore e aggiunto la gestione delle eccezioni.
 double LidarDriver::get_distance(double angle) const {
-    if (count == 0) {
+    if (count == 0 || index_new == size_t(-1)) {
         throw std::runtime_error("Il buffer è vuoto.");
     }
     if (angle < 0 || angle > 180) {
         throw std::out_of_range("L'angolo è fuori dal range.");
     }
-    size_t last_index = (index_new == 0) ? (BUFFER_DIM - 1) : (index_new - 1);
-    size_t index = static_cast<int>(angle / resolution);
-    const std::vector<double>& latest_scan = buffer.at(last_index);
+    size_t index = static_cast<size_t>(angle / resolution);
+    const std::vector<double>& latest_scan = buffer.at(index_new);
     return latest_scan.at(index);
 }
 
 //******** index_new puntava alla prossima scansione
 //******** migliorato output
 std::ostream& operator<<(std::ostream& os, const LidarDriver& lidar) {
-    if (lidar.count == 0) {
+    if (lidar.count == 0 || lidar.index_new == size_t(-1)) {
         os << "Buffer vuoto\n";
     } else {
         os << "Ultima scansione:\n";
-        size_t last_index = (lidar.index_new == 0) ? (BUFFER_DIM - 1) : (lidar.index_new - 1);
-        for (double value : lidar.buffer.at(last_index)) {
+        for (double value : lidar.buffer.at(lidar.index_new)) {
             os << value << " ";
         }
         os << "\n";
