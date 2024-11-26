@@ -37,7 +37,6 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     else { 
         buffer[index_new] = scan_copy; 
     }
-    
 }
 
 // ****** new scan provvisorio. Usato per testare la classe
