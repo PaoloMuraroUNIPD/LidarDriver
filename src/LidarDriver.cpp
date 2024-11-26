@@ -2,7 +2,7 @@
 #include <stdexcept> // Gestione delle eccezioni
 
 // Costruttore
-LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), index_old(0), index_new(-1) {
+LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), index_old(0), index_new(size_t(-1)) {
     if (resolution < 0.1 || resolution > 1.0) {
         throw std::invalid_argument("La risoluzione deve essere compresa tra 0.1 e 1.");
     }
@@ -26,7 +26,7 @@ void LidarDriver::new_scan(const std::vector<double>& scan) {
     //se la scansione ha un numero maggiore di dati taglio i dati mancanti
     if (scan_copy.size() > expected_size) { scan_copy.resize(expected_size); }
 
-    // Incrementa l'indice della scansione più vecchia se il buffer è pieno
+    // Se il buffer è pieno, sovrascrive la scansione più vecchia
     if (index_new != size_t(-1) && (index_new + 1) % BUFFER_DIM == index_old) {
         increment_index(index_old);
     }
@@ -48,7 +48,7 @@ std::vector<double> LidarDriver::get_scan() {
     }
     std::vector<double> oldest_scan = buffer[index_old];
     if (index_old == index_new) {
-        index_new = size_t(-1);
+        index_new = size_t(-1); // Il buffer diventa vuoto
     } else {
         increment_index(index_old);
     }
@@ -59,7 +59,7 @@ void LidarDriver::clear_buffer() {
     for (auto& scan : buffer) {
         scan.clear();
     }
-    index_new = size_t(-1);
+    index_new = size_t(-1); // Buffer vuoto
     index_old = 0;
 }
 

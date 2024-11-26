@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-constexpr size_t BUFFER_DIM = 10; //Dimensione massima del buffer
+constexpr size_t BUFFER_DIM = 10; //Dimensione massima del buffer circolare
 
 class LidarDriver {
 
