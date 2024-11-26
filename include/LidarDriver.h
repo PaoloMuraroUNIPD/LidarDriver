@@ -12,7 +12,6 @@ class LidarDriver {
 
         double resolution; // Risoluzione angolare (tra 0.1° e 1°)
         std::vector<std::vector<double>> buffer; // Buffer circolare delle scansioni
-        size_t size; // Numero massimo di scansioni nel buffer
         size_t count; // Numero di scansioni attualmente nel buffer
         size_t index_old; // Indice della scansione più vecchia
         size_t index_new; // Indice della scansione più recente

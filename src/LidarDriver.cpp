@@ -2,7 +2,7 @@
 #include <stdexcept> // Gestione delle eccezioni
 
 // Costruttore
-LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), size(BUFFER_DIM), count(0), index_old(0), index_new(-1) {
+LidarDriver::LidarDriver(double res) : resolution(res), buffer(BUFFER_DIM), count(0), index_old(0), index_new(-1) {
     if (resolution < 0.1 || resolution > 1.0) {
         throw std::invalid_argument("La risoluzione deve essere compresa tra 0.1 e 1.");
     }
